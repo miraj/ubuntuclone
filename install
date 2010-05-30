@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if test -z $1
+then
+	echo "Usage: ./install <boot-tar-file> <root-tar-file>"
+	exit
+fi
+
+./clone $1 $2
+./grub.install
+
+echo "==================================================="
+echo ""
+echo ""
+echo "  1. Power off the server (poweroff command)"
+echo "  2. Remove the USB disk"
+echo "  3. Power on the server"
+echo "     You should get the linux login monitor and console"
+echo "       ENJOY! "
+echo "==================================================="
+

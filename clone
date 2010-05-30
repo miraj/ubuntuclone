@@ -1,0 +1,72 @@
+#!/bin/bash
+
+verbose=$3
+export PATH=/sbin:/bin
+
+HD_DEVICE=/dev/sdc
+HD_DEVICE1=/dev/sdc1
+HD_DEVICE2=/dev/sdc2
+
+#FLASH_DEVICE=/dev/sda
+#FLASH_DEVICE1=/dev/sda1
+BOOT_TAR=$1
+ROOT_TAR=$2
+
+BOOT_PART=/mnt/boot
+ROOT_PART=/mnt/root
+#FLASHDISK=/mnt/usb
+BOOT_IMAGE=$BOOT_TAR
+ROOT_IMAGE=$ROOT_TAR
+
+echo "Label the harddisk"
+parted $HD_DEVICE mklabel "msdos"
+sync
+echo "Create primary partition of size 100 MB"
+parted $HD_DEVICE mkpart primary 0.031 100
+sync
+echo "Create primary partition of size 400 GB"
+parted $HD_DEVICE mkpart primary 101 450000
+sync
+echo "Set the Boot Flag on the partition"
+parted $HD_DEVICE set 1 boot on
+parted $HD_DEVICE set 2 boot on
+sync
+#echo "Create Swap partition"
+#parted $HD_DEVICE mkpartfs primary linux-swap 30000 31024
+#sync
+echo "Format first partition to ext3 and label it as boot (/boot)"
+echo " This will take few seconds ..... "
+mkfs.ext3 -L /boot $HD_DEVICE1
+sync
+echo "Format second partition to ext3 and label it as ROOT (/)"
+echo " This will take few minutes ..... "
+mkfs.ext3 -L / $HD_DEVICE2
+sync
+
+# mount the partitions
+mkdir -p $BOOT_PART
+mount $HD_DEVICE1 $BOOT_PART
+mkdir -p $ROOT_PART
+mount $HD_DEVICE2 $ROOT_PART
+
+echo "Untarring the kernel image and associated files"
+cd  $BOOT_PART
+if ! test -z $verbose
+then
+	tar xzvmf $BOOT_IMAGE
+else
+	tar xzmf $BOOT_IMAGE
+fi
+
+echo "Untarring the root filesystem"
+cd  $ROOT_PART
+if ! test -z $verbose
+then
+	tar xzvmf $ROOT_IMAGE
+else
+	tar xzmf $ROOT_IMAGE
+fi
+
+#let all the files get flushed to hard disk
+sync
+

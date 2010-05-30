@@ -1,0 +1,33 @@
+#!/bin/bash
+# create partitions in the new storage drives
+
+STORAGE_DISK1=/dev/sdd
+STORAGE_DISK2=/dev/sde
+STORAGE_DISK3=/dev/sdf
+STORAGE_PART1=$STORAGE_DISK1"1"
+STORAGE_PART2=$STORAGE_DISK2"1"
+STORAGE_PART3=$STORAGE_DISK3"1"
+
+echo "Creating first storage partition"
+parted $STORAGE_DISK1 mkpart primary 0.031 450000
+sync
+echo "Formatting first storage partition as ext3"
+echo " This will take few minutes..."
+mkfs.ext3 $STORAGE_PART1
+sync
+
+echo "Creating second storage partition"
+parted $STORAGE_DISK2 mkpart primary 0.031 450000
+sync
+echo "Formatting second storage partition as ext3"
+echo " This will take few minutes..."
+mkfs.ext3 $STORAGE_PART2
+sync
+
+echo "Creating third storage partition"
+parted $STORAGE_DISK3 mkpart primary 0.031 450000
+sync
+echo "Formatting third storage partition as ext3"
+echo " This will take few minutes..."
+mkfs.ext3 $STORAGE_PART3
+sync

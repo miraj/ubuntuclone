@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo "Installing grub... "
+
+#HARDDISK=/mnt/harddisk
+BOOT_PART=/mnt/boot
+ROOT_PART=/mnt/root
+HD_DEVICE=/dev/sdc
+HD_DEVICE1=$HD_DEVICE"1"
+#FLASHDISK=/mnt/usb
+#cp $FLASHDISK/stage* $HARDDISK/usr/share/grub/i386-redhat/
+
+# mount boot partition under root partition
+umount $BOOT_PART
+mkdir -p $ROOT_PART/boot
+mount $HD_DEVICE1 $ROOT_PART/boot
+#chroot $ROOT_PART /sbin/grub-install $HD_DEVICE
+/sbin/grub-install $HD_DEVICE --root=$ROOT_PART/boot/grub
+
+echo "Unmounting filesystem.."
+umount $ROOT_PART/boot
+umount $ROOT_PART
+#umount $FLASHDISK
+
